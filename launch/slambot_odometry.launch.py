@@ -9,4 +9,8 @@ def generate_launch_description():
             arguments=['serial', '--dev', '/dev/ttyUSB0'],
             output='screen',
         ),
+        Node(
+            package='slambot_odometry_pkg',
+            executable='odometry_publisher'
+        )
     ])

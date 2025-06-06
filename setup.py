@@ -21,8 +21,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            # Example for later:
-            # 'odometry_node = slambot_odometry_pkg.odometry_node:main',
+            "odometry_publisher = slambot_odometry_pkg.odometry_publisher:main",
         ],
     },
 )
