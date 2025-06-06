@@ -25,10 +25,10 @@ class OdometryPublisher(Node):
         self.last_left_encoder_ticks = 0
         self.last_right_encoder_ticks = 0
 
-        self.encoder_ticks_subscriber_ = self.create_subscription(EncoderTicks, "encoder_ticks", self.callback_calculate_pose, 10)
+        self.encoder_ticks_subscriber_ = self.create_subscription(EncoderTicks, "encoder_ticks", self.callback_update_pose, 10)
         self.get_logger().info("Running odometry publisher node")
     
-    def callback_calculate_pose(self, msg: EncoderTicks):
+    def callback_update_pose(self, msg: EncoderTicks):
         left_encoder_ticks = msg.left_encoder
         right_encoder_ticks = msg.right_encoder
         self.get_logger().info(f"Left: {left_encoder_ticks}, Right: {right_encoder_ticks}")
