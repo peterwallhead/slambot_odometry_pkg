@@ -4,7 +4,12 @@ import math
 
 import rclpy
 from rclpy.node import Node
+from nav_msgs.msg import Odometry
+from geometry_msgs.msg import Quaternion
+
 from slambot_interfaces.msg import EncoderTicks
+
+import tf_transformations
 
 # Physical robot constants
 WHEEL_BASE = 0.233
@@ -26,6 +31,8 @@ class OdometryPublisher(Node):
         self.last_right_encoder_ticks = 0
 
         self.encoder_ticks_subscriber_ = self.create_subscription(EncoderTicks, "encoder_ticks", self.callback_update_pose, 10)
+        self.odom_publisher_ = self.create_publisher(Odometry, 'odom', 10)
+
         self.get_logger().info("Running odometry publisher node")
     
     def callback_update_pose(self, msg: EncoderTicks):
@@ -48,6 +55,25 @@ class OdometryPublisher(Node):
         self.pose_theta += delta_theta
 
         self.get_logger().info(f"{self.pose_x}, {self.pose_y}, {self.pose_theta}")
+
+        self.publish_odometry()
+
+    def publish_odometry(self):
+        # Publish odometry message
+        odom_msg = Odometry()
+        odom_msg.header.stamp = self.get_clock().now().to_msg()
+        odom_msg.header.frame_id = 'odom'
+        odom_msg.child_frame_id = 'base_link'
+
+        odom_msg.pose.pose.position.x = self.pose_x
+        odom_msg.pose.pose.position.y = self.pose_y
+        odom_msg.pose.pose.position.z = 0.0
+
+        # Convert yaw (theta) to quaternion
+        q = tf_transformations.quaternion_from_euler(0, 0, self.pose_theta)
+        odom_msg.pose.pose.orientation = Quaternion(x=q[0], y=q[1], z=q[2], w=q[3])
+
+        self.odom_publisher_.publish(odom_msg)
 
 def main(args=None):
     rclpy.init(args=args)
