@@ -2,6 +2,9 @@
 
 import math
 
+from tf2_ros import TransformBroadcaster
+from geometry_msgs.msg import TransformStamped
+
 import rclpy
 from rclpy.node import Node
 from nav_msgs.msg import Odometry
@@ -20,6 +23,7 @@ TICKS_PER_REV = 292
 class OdometryPublisher(Node):
     def __init__(self):
         super().__init__("odometry_publisher")
+        self.tf_broadcaster = TransformBroadcaster(self)
         
         # Initial robot pose
         self.pose_x = 0.0
@@ -74,6 +78,17 @@ class OdometryPublisher(Node):
         odom_msg.pose.pose.orientation = Quaternion(x=q[0], y=q[1], z=q[2], w=q[3])
 
         self.odom_publisher_.publish(odom_msg)
+
+        t = TransformStamped()
+        t.header.stamp = odom_msg.header.stamp
+        t.header.frame_id = 'odom'
+        t.child_frame_id = 'base_link'
+        t.transform.translation.x = self.pose_x
+        t.transform.translation.y = self.pose_y
+        t.transform.translation.z = 0.0
+        t.transform.rotation = odom_msg.pose.pose.orientation
+
+        self.tf_broadcaster.sendTransform(t)
 
 def main(args=None):
     rclpy.init(args=args)
