@@ -15,10 +15,10 @@ from slambot_interfaces.msg import EncoderTicks
 import tf_transformations
 
 # Physical robot constants
-WHEEL_BASE = 0.233
-WHEEL_RADIUS = 0.036
+WHEEL_BASE = 0.280
+WHEEL_RADIUS = 0.030
 WHEEL_CIRCUMFERENCE = 2 * math.pi * WHEEL_RADIUS
-TICKS_PER_REV = 292
+TICKS_PER_REV = 1400
 
 class OdometryPublisher(Node):
     def __init__(self):
